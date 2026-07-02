@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microfluidic Capacity Calculator</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f9; padding: 20px; color: #333; }
+        .calculator-container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-size: 0.9em; font-weight: 600; margin-bottom: 5px; color: #555; }
+        input[type="number"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
+        .results { background: #e8f4f8; padding: 15px; border-radius: 8px; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95em; }
+        .primary-result { font-size: 1.2em; font-weight: bold; color: #d35400; border-top: 1px solid #bce8f1; padding-top: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    <h2>Microfluidic Capacity Calculator</h2>
+    
+    <div class="grid">
+        <div class="input-group">
+            <label>Channel Width (µm)</label>
+            <input type="number" id="width" value="500" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Channel Height (µm)</label>
+            <input type="number" id="height" value="150" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Channel Length (mm)</label>
+            <input type="number" id="length" value="1270" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Usable Herringbone Bonus (%)</label>
+            <input type="number" id="shm" value="20" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>NP Coverage (%)</label>
+            <input type="number" id="np" value="66" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Binding Density (µg/cm²)</label>
+            <input type="number" step="0.01" id="density" value="0.33" oninput="calculate()">
+        </div>
+        <div class="input-group" style="grid-column: span 2;">
+            <label>Chaotic Advection Efficiency (%)</label>
+            <input type="number" id="efficiency" value="80" oninput="calculate()">
+        </div>
+    </div>
+
+    <div class="results">
+        <div class="result-item"><span>Base Flat Area:</span> <span id="res-flat">0.00 cm²</span></div>
+        <div class="result-item"><span>Usable Grooved Area:</span> <span id="res-grooved">0.00 cm²</span></div>
+        <div class="result-item"><span>Total Accessible Area:</span> <span id="res-total">0.00 cm²</span></div>
+        <div class="result-item"><span>Constrained Static Capacity:</span> <span id="res-static">0.00 µg</span></div>
+        <div class="result-item primary-result"><span>Realistic Dynamic Capacity:</span> <span id="res-dynamic">0.00 µg</span></div>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        // Get input values
+        const width = parseFloat(document.getElementById('width').value) || 0;
+        const height = parseFloat(document.getElementById('height').value) || 0;
+        const length = parseFloat(document.getElementById('length').value) || 0;
+        const shmBonus = parseFloat(document.getElementById('shm').value) || 0;
+        const npCoverage = parseFloat(document.getElementById('np').value) || 0;
+        const density = parseFloat(document.getElementById('density').value) || 0;
+        const efficiency = parseFloat(document.getElementById('efficiency').value) || 0;
+
+        // Math logic
+        const baseFlatArea = 2 * ((width / 10000) + (height / 10000)) * (length / 10);
+        const usableGroovedArea = baseFlatArea * (1 + (shmBonus / 100));
+        const areaMultiplier = (4 * (npCoverage / 100)) + (1 - (npCoverage / 100));
+        const totalAccessibleArea = usableGroovedArea * areaMultiplier;
+        const staticCapacity = totalAccessibleArea * density;
+        const dynamicCapacity = staticCapacity * (efficiency / 100);
+
+        // Update UI
+        document.getElementById('res-flat').innerText = baseFlatArea.toFixed(2) + " cm²";
+        document.getElementById('res-grooved').innerText = usableGroovedArea.toFixed(2) + " cm²";
+        document.getElementById('res-total').innerText = totalAccessibleArea.toFixed(2) + " cm²";
+        document.getElementById('res-static').innerText = staticCapacity.toFixed(2) + " µg";
+        document.getElementById('res-dynamic').innerText = dynamicCapacity.toFixed(2) + " µg";
+    }
+
+    // Run on initial load
+    calculate();
+</script>
+
+</body>
+</html>
