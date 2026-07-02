@@ -1,3 +1,4 @@
+HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,8 +41,8 @@
             <input type="number" id="shm" value="20" oninput="calculate()">
         </div>
         <div class="input-group">
-            <label>NP Coverage (%)</label>
-            <input type="number" id="np" value="66" oninput="calculate()">
+            <label>Surface Area Multiplier (x)</label>
+            <input type="number" step="0.1" id="multiplier" value="3.0" oninput="calculate()">
         </div>
         <div class="input-group">
             <label>Binding Density (µg/cm²)</label>
@@ -69,14 +70,13 @@
         const height = parseFloat(document.getElementById('height').value) || 0;
         const length = parseFloat(document.getElementById('length').value) || 0;
         const shmBonus = parseFloat(document.getElementById('shm').value) || 0;
-        const npCoverage = parseFloat(document.getElementById('np').value) || 0;
+        const areaMultiplier = parseFloat(document.getElementById('multiplier').value) || 1;
         const density = parseFloat(document.getElementById('density').value) || 0;
         const efficiency = parseFloat(document.getElementById('efficiency').value) || 0;
 
         // Math logic
         const baseFlatArea = 2 * ((width / 10000) + (height / 10000)) * (length / 10);
         const usableGroovedArea = baseFlatArea * (1 + (shmBonus / 100));
-        const areaMultiplier = (4 * (npCoverage / 100)) + (1 - (npCoverage / 100));
         const totalAccessibleArea = usableGroovedArea * areaMultiplier;
         const staticCapacity = totalAccessibleArea * density;
         const dynamicCapacity = staticCapacity * (efficiency / 100);
